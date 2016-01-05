@@ -1,0 +1,27 @@
+```{r}
+# Step 1 Load Data
+data = read.table("countrydata_withregion.tsv",sep="\t",header=TRUE,quote="")
+head(data,n=10)
+
+# Step 2 Scatter plot of Log Transformed Data
+library(ggplot2)
+area = data$area
+area = log(area)
+population = data$population
+population = log(population)
+qplot(area,population)
+
+# Step 3 Data Aggregation by Region
+data.agg.area = aggregate(data$area, by=list(data$region), FUN=sum)
+pie(data.agg.area$x, labels=data.agg.area$Group.1)
+data$population = as.numeric(data$population)
+data.agg.pop = aggregate(data$population, by=list(data$region), FUN=sum)
+print(data.agg.pop)
+pie(data.agg.pop$x, labels=data.agg.pop$Group.1)
+
+# Step 4 Visualization of Population per sq km of Regions
+data.new = data.frame(region = data.agg.pop$Group.1,pop.density = (data.agg.pop$x/data.agg.area$x))
+newdata = data.new[order(-data.new$pop.density),] 
+qplot(data.new$region, data.new$pop.density, geom = "bar",stat="identity")+ theme(axis.text.x = element_text(angle = 60, hjust = 1))
+```
+knit2html("si618f15_hw1_report_baddu.Rmd")
